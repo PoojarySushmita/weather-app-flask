@@ -9,7 +9,7 @@ from flask import session
 app = Flask(__name__)
 app.secret_key = "your_secret_key_here"
 
-API_KEY = "Your_API_KEY_HERE"
+API_KEY = "YOUR_API_KEY_HERE"
 
 # ---------------- DATABASE ---------------- #
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
