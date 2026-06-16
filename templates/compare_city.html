@@ -1,0 +1,121 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Monitoring System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="compare_page">
+ <div class="layout">
+    <div class="sidebar">
+    <h2>☁ SKYSNAP</h2>
+    <a href="/single" class="{% if request.path == '/single' %}active{% endif %}">🏠 Home</a>
+    <a href="/compare" class="{% if request.path == '/compare' %}active{% endif %}">🔄 Compare</a>
+    <a href="/history" class="{% if request.path == '/history' %}active{% endif %}">📊 History</a>
+    <a href="/trends" class="{% if request.path == '/trends' %}active{% endif %}">📈 Trends</a>
+    <a href="/feedback" class="{% if request.path == '/feedback' %}active{% endif %}">⭐ Feedback</a>
+    <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">i About</a>
+    <a href="/admin/login" class="admin-secret"></a>
+
+    {% if session.get("admin_logged_in") %}
+
+    <a href="/admin/logout">🚪 Logout</a>
+{% else %}
+{% endif %}
+</div>
+    <div class="main">
+        <form method="POST" action="/compare" class="compare_form">
+            <input type="hidden" name="form_type" value="compare">
+            <input type="text" name="city1" placeholder="Enter first city" required>
+            <input type="text" name="city2" placeholder="Enter second city" required>
+            <button type="submit">COMPARE CITIES</button>
+        </form>
+        {% if city_compare %}
+    {% if city_compare.error %}
+        <p style="color:rgb(4, 3, 3);"><strong>{{ city_compare.error }}</strong></p>
+    {% else %}
+       {% if city_compare %}
+<div class="card">
+<h2>{{ city_compare.city1.city }} Weather</h2>
+
+<p>🌡 {{ city_compare.city1.temp }} °C</p>
+<p>💧 {{ city_compare.city1.humidity }} %</p>
+<p>☁ {{ city_compare.city1.desc }}</p>
+<p>💨 Wind: {{ city_compare.city1.wind }} m/s</p>
+</div>
+
+{% if city_compare.forecast1 %}
+<div class="card">
+<h2>5-day Forecast</h2>
+
+{% for day in city_compare.forecast1 %}
+<p>{{ day.date }} — {{ day.temp }} °C — {{ day.desc }}</p>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+<h2>{{ city_compare.city2.city }} Weather </h2>
+
+<p>🌡 {{ city_compare.city2.temp }} °C</p>
+<p>💧 {{ city_compare.city2.humidity }} %</p>
+<p>☁ {{ city_compare.city2.desc }}</p>
+<p>💨 Wind: {{ city_compare.city2.wind }} m/s</p>
+
+</div>
+
+{% if city_compare.forecast2 %}
+<div class="card">
+<h2>5-day Forecast</h2>
+
+{% for day in city_compare.forecast2 %}
+<p>{{ day.date }} — {{ day.temp }} °C — {{ day.desc }}</p>
+{% endfor %}
+</div>
+
+{% endif %}
+<div class="card">
+<p><strong>{{ city_compare.result }}</strong></p>
+</div>
+{% endif %}
+        
+    {% endif %}
+{% endif %}
+
+{% if city_compare and city_compare.graph1 %}
+
+<div class="card">
+<h2 style="text-align:center;">Weather Comparison Graph</h2>
+<canvas id="weatherCompareChart"></canvas>
+</div>
+
+<script>
+
+window.weatherCompareData = {
+
+city1: "{{ city_compare.city1.city }}",
+city2: "{{ city_compare.city2.city }}",
+
+hours: {{ city_compare.graph1.hours | tojson }},
+
+temps1: {{ city_compare.graph1.temps | tojson }},
+temps2: {{ city_compare.graph2.temps | tojson }},
+
+winds1: {{ city_compare.graph1.winds | tojson }},
+winds2: {{ city_compare.graph2.winds | tojson }},
+
+precip1: {{ city_compare.graph1.precip | tojson }},
+precip2: {{ city_compare.graph2.precip | tojson }}
+
+};
+
+</script>
+
+
+{% endif %}
+    </div>
+ </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login - SKYSNAP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="admin_login">
+
+    <div class="admin-container">
+        <h2>Admin Login</h2>
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username">
+            <input type="password" name="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+
+        <a href="/single" class="home-link">🏠 Back to Home</a>
+    </div>
+
+    <!-- POPUP ERROR MESSAGE -->
+    {% if message %}
+<div id="popupModal" class="popup-modal">
+    <div class="popup-box">
+        <p>{{ message }}</p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        document.getElementById("popupModal").style.display = "flex";
+    }
+
+    function closePopup() {
+        document.getElementById("popupModal").style.display = "none";
+    }
+</script>
+{% endif %}
+</body>
+</html>

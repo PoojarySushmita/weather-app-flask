@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SKYSNAP Weather History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+    <h2>☁ SKYSNAP</h2>
+    <a href="/single" class="{% if request.path == '/single' %}active{% endif %}">🏠 Home</a>
+    <a href="/compare" class="{% if request.path == '/compare' %}active{% endif %}">🔄 Compare</a>
+    <a href="/history" class="{% if request.path == '/history' %}active{% endif %}">📊 History</a>
+    <a href="/trends" class="{% if request.path == '/trends' %}active{% endif %}">📈 Trends</a>
+    <a href="/feedback" class="{% if request.path == '/feedback' %}active{% endif %}">⭐ Feedback</a>
+    <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">i About</a>
+    <a href="/admin/login" class="admin-secret"></a>
+    {% if session.get("admin_logged_in") %}
+    <a href="/admin/logout">🚪 Logout</a>
+{% else %}
+
+{% endif %}
+</div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <h2>📊 Weather History Dashboard</h2>
+
+        <!-- FILTER -->
+        <form method="POST" class="history-filter">
+            <input type="text" name="search" placeholder="Search city..." value="{{ request.form.get('search', '') }}">
+            <input type="date" name="start_date" value="{{ request.form.get('start_date', '') }}" required>
+            <input type="date" name="end_date" value="{{ request.form.get('end_date', '') }}" required>
+            <button type="submit">Filter</button>
+        </form>
+        {% if error %}
+<div style="background:#ffe6e6; color:#cc0000; padding:10px; border-radius:6px; text-align:center; margin-top:10px;">
+    {{ error }}
+</div>
+{% endif %}
+        <!-- CHART -->
+        <div class="card">
+            <h3>📈 Temperature Trend</h3>
+            <canvas id="historyChart"></canvas>
+        </div>
+
+        <!-- HISTORY TABLE + MULTI-SELECT DELETE -->
+        {% if rows %}
+        <form method="POST" action="/delete_selected_history" class="history-card">
+
+    {% if session.get("admin_logged_in") %}
+    <button type="submit" class="delete-btn" id="deleteSelectedBtn" style="display:none;">
+        Delete Selected
+    </button>
+    {% endif %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        {% if session.get("admin_logged_in") %}                        
+                        <th>Select</th>{% endif %}
+                        <th>🌍 City</th>
+                        <th>🌡 Temperature</th>
+                        <th>📅 Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        {% if session.get("admin_logged_in") %}
+                        <td>
+                            <input type="checkbox" name="selected_ids" value="{{ row.id }}" class="select-checkbox">
+                        </td>
+                        {% endif %}
+                        <td>{{ row.city }}</td>
+                        <td class="temp">{{ row.temperature }} °C</td>
+                        <td>{{ row.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        {% else %}
+        <p>No history available.</p>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+// ===== CHART =====
+const ctx = document.getElementById('historyChart');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ graph_dates | tojson }},
+        datasets: [{
+            label: 'Temperature (°C)',
+            data: {{ graph_temps | tojson }},
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// ===== SHOW/HIDE FLOATING DELETE BUTTON =====
+const checkboxes = document.querySelectorAll('.select-checkbox');
+const deleteBtn = document.getElementById('deleteSelectedBtn');
+
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+        const anyChecked = Array.from(checkboxes).some(c => c.checked);
+        deleteBtn.style.display = anyChecked ? 'block' : 'none';
+    });
+});
+</script>
+
+</body>
+</html>

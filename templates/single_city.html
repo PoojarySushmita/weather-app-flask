@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SKYSNAP Weather</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="single_page {{ weather.desc if weather else '' }}">
+
+<div class="layout">
+<div class="sidebar">
+    <h2>☁ SKYSNAP</h2>
+    <a href="/single" class="{% if request.path == '/single' %}active{% endif %}">🏠 Home</a>
+    <a href="/compare" class="{% if request.path == '/compare' %}active{% endif %}">🔄 Compare</a>
+    <a href="/history" class="{% if request.path == '/history' %}active{% endif %}">📊 History</a>
+    <a href="/trends" class="{% if request.path == '/trends' %}active{% endif %}">📈 Trends</a>
+    <a href="/feedback" class="{% if request.path == '/feedback' %}active{% endif %}">⭐ Feedback</a>
+    <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">i About</a>
+    <a href="/admin/login" class="admin-secret"></a>
+
+{% if session.get("admin_logged_in") %}
+   
+    <a href="/admin/logout">🚪 Logout</a>
+{% else %}
+{% endif %}
+</div>
+
+    <div class="main">
+        <!-- SEARCH BAR -->
+        <form id="cityForm" method="POST" action="/single">
+            <input type="text" name="city" placeholder="Search city..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- LOCATION BUTTON -->
+        <button onclick="getLocation()">📍 Use My Location</button>
+
+        <!-- HIDDEN FORM FOR LOCATION -->
+        <form id="locationForm" method="POST" action="/single">
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lon" id="lon">
+        </form>
+
+        <!-- WEATHER DISPLAY -->
+        {% if weather %}
+        <div class="card">
+            <h2>{{ weather.city }}</h2>
+            <p>🌡 {{ weather.temp }} °C</p>
+            <p>💧 {{ weather.humidity }} %</p>
+            <p>☁ {{ weather.desc }}</p>
+            <p>💨 Wind: {{ weather.wind }} m/s</p>
+            {% if comparison %}
+            <p>{{ comparison }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- FORECAST -->
+        {% if forecast %}
+        <div class="card">
+            <h2>5-Day Forecast</h2>
+            {% for day in forecast %}
+                <p>{{ day.date }} — {{ day.temp }} °C — {{ day.desc }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- WEATHER GRAPH -->
+        {% if hours and temps %}
+        <div class="card">
+            <h2>Weather Graph</h2>
+            <canvas id="weatherChart"></canvas>
+            <script>
+                window.weatherChartData = {
+                    hours: {{ hours | tojson }},
+                    temps: {{ temps | tojson }},
+                    winds: {{ winds | tojson }},
+                    precip: {{ precip | tojson }}
+                };
+            </script>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const locationLoaded = {{ 'true' if location_loaded else 'false' | safe }};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            document.getElementById("lat").value = position.coords.latitude;
+            document.getElementById("lon").value = position.coords.longitude;
+            document.getElementById("locationForm").submit();
+        }, function (error) {
+            alert("Could not get your location. Please allow location access.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+</script>
+
+</body>
+</html>

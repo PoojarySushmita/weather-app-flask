@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>About SKYSNAP Weather</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- GOOGLE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+/* ==== GLOBAL STYLES ==== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #a3d4f7;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ==== LAYOUT ==== */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ==== SIDEBAR ==== */
+.sidebar {
+    width: 220px;
+    background: linear-gradient(180deg, #14c7de, #120f0f);
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+.sidebar h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.1rem;
+    padding: 10px 5px;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+.sidebar a:hover, .sidebar a.active {
+    background: rgba(255,255,255,0.2);
+    font-weight: 700;
+}
+
+/* ==== MAIN CONTENT ==== */
+.main {
+    margin-left: 220px;
+    padding: 30px;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+/* ==== CARDS ==== */
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease-in-out;
+    position: relative;
+}
+.card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.card .icon {
+    position: absolute;
+    font-size: 2.5rem;
+    top: 10px;
+    right: 15px;
+    animation: floatIcon 3s ease-in-out infinite alternate;
+}
+@keyframes floatIcon {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+}
+
+/* ==== FLOATING CLOUDS ==== */
+.cloud {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.3;
+    animation: floatClouds 25s linear infinite;
+    z-index: 1;
+}
+.cloud1 { top: 10%; left: 0%; animation-delay: 0s; }
+.cloud2 { top: 30%; left: -10%; animation-delay: 5s; }
+.cloud3 { top: 50%; left: -20%; animation-delay: 10s; }
+
+@keyframes floatClouds {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(120vw); }
+}
+
+/* ==== HEADINGS ==== */
+h1 {
+    text-align: center;
+    color: #4416da;
+    margin-bottom: 30px;
+}
+h2 {
+    color: #331957;
+    margin-bottom: 10px;
+}
+ul {
+    margin-left: 20px;
+}
+ul li {
+    margin-bottom: 5px;
+}
+a {
+    color: #120f0f;
+    text-decoration: underline;
+}
+</style>
+</head>
+<body class="about_page">
+
+<!-- Floating Clouds -->
+<div class="cloud cloud1">☁</div>
+<div class="cloud cloud2">☁</div>
+<div class="cloud cloud3">☁</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+    <h2>☁ SKYSNAP</h2>
+    <a href="/single" class="{% if request.path == '/single' %}active{% endif %}">🏠 Home</a>
+    <a href="/compare" class="{% if request.path == '/compare' %}active{% endif %}">🔄 Compare</a>
+    <a href="/history" class="{% if request.path == '/history' %}active{% endif %}">📊 History</a>
+    <a href="/trends" class="{% if request.path == '/trends' %}active{% endif %}">📈 Trends</a>
+    <a href="/feedback" class="{% if request.path == '/feedback' %}active{% endif %}">⭐ Feedback</a>
+    <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">i About</a>
+    <a href="/admin/login" class="admin-secret"></a>
+
+    {% if session.get("admin_logged_in") %}
+   
+    <a href="/admin/logout">🚪 Logout</a>
+{% else %}
+{% endif %}
+</div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <h1> ABOUT SKYSNAP Weather</h1>
+
+        <!-- APP DESCRIPTION -->
+        <div class="card">
+            <div class="icon">🌞</div>
+            <h2>Welcome!</h2>
+            <p>SKYSNAP is your friendly weather app that helps you check current weather, forecasts, trends, and historical data worldwide. Get accurate weather insights anytime!</p>
+        </div>
+
+        <!-- FEATURES -->
+        <div class="card">
+            <div class="icon">🌟</div>
+            <h2>Features</h2>
+            <ul>
+                <li>Real-time weather updates for any city</li>
+                <li>5-day forecast and 3-hourly data</li>
+                <li>Temperature, wind, and precipitation graphs</li>
+                <li>Compare weather between two cities</li>
+                <li>Track historical weather trends</li>
+                <li>Analytics and trend insights</li>
+            </ul>
+        </div>
+
+        <!-- DEVELOPER -->
+        <div class="card">
+            <div class="icon">👩‍💻</div>
+            <h2>Developer</h2>
+            <p>Created by <strong>Team SKYSNAP</strong>, exploring Python, Flask, and web APIs.</p>
+        </div>
+
+        <!-- DATA SOURCES -->
+        <div class="card">
+            <div class="icon">📡</div>
+            <h2>Data Sources</h2>
+            <ul>
+                <li><a href="https://openweathermap.org/api" target="_blank">OpenWeather API</a> — current weather & forecast</li>
+                <li><a href="https://nominatim.org/release-docs/latest/api/Overview/" target="_blank">OpenStreetMap Nominatim API</a> — reverse geocoding</li>
+            </ul>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="card">
+            <div class="icon">✉</div>
+            <h2>Contact</h2>
+            <p>Suggestions or feedback? Reach out: <a href="mailto:your-email@skysnap.com">your-email@skysnap.com</a></p>
+        </div>
+
+        <!-- FUN FACT -->
+        <div class="card">
+            <div class="icon">☁</div>
+            <h2>Fun Fact</h2>
+            <p>SKYSNAP can track your local weather automatically using your device location! 🌍</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- JS: Animate cards on scroll -->
+<script>
+function animateCards() {
+    const cards = document.querySelectorAll('.card');
+    const windowBottom = window.innerHeight;
+    cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < windowBottom - 50) {
+            card.classList.add('show');
+        }
+    });
+}
+window.addEventListener('scroll', animateCards);
+window.addEventListener('load', animateCards);
+</script>
+
+</body>
+</html>

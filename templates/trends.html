@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SKYSNAP Weather Trends</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- GOOGLE FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+<!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="trends_page">
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+    <h2>☁ SKYSNAP</h2>
+    <a href="/single" class="{% if request.path == '/single' %}active{% endif %}">🏠 Home</a>
+    <a href="/compare" class="{% if request.path == '/compare' %}active{% endif %}">🔄 Compare</a>
+    <a href="/history" class="{% if request.path == '/history' %}active{% endif %}">📊 History</a>
+    <a href="/trends" class="{% if request.path == '/trends' %}active{% endif %}">📈 Trends</a>
+    <a href="/feedback" class="{% if request.path == '/feedback' %}active{% endif %}">⭐ Feedback</a>
+    <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">i About</a>
+    <a href="/admin/login" class="admin-secret"></a>
+
+{% if session.get("admin_logged_in") %}
+
+    <a href="/admin/logout">🚪 Logout</a>
+{% else %}
+{% endif %}
+</div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <h1>📈 Weather Trends Dashboard</h1>
+
+        <!-- CITY SEARCH FORM -->
+        <form method="POST" action="/trends" class="trend-search">
+            <input type="text" name="city" placeholder="Enter city name..." required>
+            <button type="submit">Show Trends</button>
+        </form>
+        {% if avg_temp %}
+        <div class="card">
+        <h2>🌡 Average Temperature</h2>
+        <p style="font-size:28px;">{{ avg_temp }} °C</p>
+        </div>
+        {% endif %}
+        {% if trend_message %}
+        <div class="card">
+        <h2>📊 Trend Insight</h2>
+        <p>{{ trend_message }}</p>
+        </div>
+        {% endif %}
+        <!-- WEATHER API CHARTS -->
+            {% if city_name %}
+            <div class="card">
+                <h2>{{ city_name }} Temperature Trend</h2>
+                <canvas id="tempChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>{{ city_name }} Wind Speed Trend</h2>
+                <canvas id="windChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>{{ city_name }} Rain Probability</h2>
+                <canvas id="rainChart"></canvas>
+            </div>
+        {% else %}
+            <p class="info">Search a city to see weather trend analytics.</p>
+        {% endif %}
+
+        <!-- DATABASE CHARTS -->
+        <div class="card">
+            <h2>📊 Temperature History (Database)</h2>
+            <canvas id="historyChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h2>🌍 Most Searched Cities</h2>
+            <canvas id="cityChart"></canvas>
+        </div>
+
+        <!-- PASS DATA TO JS -->
+        <script>
+            window.trendsData = {{ trendData | tojson | safe }};
+            window.historyData = {
+                dates: {{ history_dates | tojson }},
+                temps: {{ history_temps | tojson }}
+            };
+            window.cityData = {
+                cities: {{ city_names | tojson }},
+                counts: {{ city_counts | tojson }}
+            };
+
+            console.log("Trend Data:", window.trendsData);
+            console.log("History Data:", window.historyData);
+            console.log("City Data:", window.cityData);
+        </script>
+
+        <!-- JS -->
+        <script src="{{ url_for('static', filename='trends.js') }}"></script>
+
+    </div>
+</div>
+<script>
+console.log("JS WORKING");
+</script>
+</body>
+</html>
